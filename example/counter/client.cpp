@@ -111,7 +111,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    std::vector<bthread_t> tids;
+    std::vector<pthread_t> tids;
+    std::vector<bthread_t> bids;
     tids.resize(FLAGS_thread_num);
     if (!FLAGS_use_bthread) {
         for (int i = 0; i < FLAGS_thread_num; ++i) {
@@ -122,7 +123,7 @@ int main(int argc, char* argv[]) {
         }
     } else {
         for (int i = 0; i < FLAGS_thread_num; ++i) {
-            if (bthread_start_background(&tids[i], NULL, sender, NULL) != 0) {
+            if (bthread_start_background(&bids[i], NULL, sender, NULL) != 0) {
                 LOG(ERROR) << "Fail to create bthread";
                 return -1;
             }
@@ -143,7 +144,7 @@ int main(int argc, char* argv[]) {
         if (!FLAGS_use_bthread) {
             pthread_join(tids[i], NULL);
         } else {
-            bthread_join(tids[i], NULL);
+            bthread_join(bids[i], NULL);
         }
     }
 

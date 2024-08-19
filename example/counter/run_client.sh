@@ -35,7 +35,7 @@ DEFINE_string use_bthread "true" "Use bthread to send request"
 FLAGS "$@" || exit 1
 
 # hostname prefers ipv6
-IP=`hostname -i | awk '{print $NF}'`
+IP=`hostname -f | awk '{print $NF}'`
 
 if [ "$FLAGS_valgrind" == "true" ] && [ $(which valgrind) ] ; then
     VALGRIND="valgrind --tool=memcheck --leak-check=full"
@@ -43,12 +43,14 @@ fi
 
 raft_peers=""
 for ((i=0; i<$FLAGS_server_num; ++i)); do
-    raft_peers="${raft_peers}${IP}:$((${FLAGS_server_port}+i)):0,"
+    raft_peers="${raft_peers}${IP}:$((${FLAGS_server_port}+i)):$i,"
 done
+
+echo ${raft_peers}
 
 export TCMALLOC_SAMPLE_PARAMETER=524288
 
-${VALGRIND} ./counter_client \
+./counter_client \
         --add_percentage=${FLAGS_add_percentage} \
         --bthread_concurrency=${FLAGS_bthread_concurrency} \
         --conf="${raft_peers}" \

@@ -32,6 +32,13 @@ else()
     find_library(BRAFT_LIB NAMES libbraft.a braft)
 endif()
 
+find_library(GFLAGS_LIB NAMES gflags)
+if ((NOT GFLAGS_INCLUDE_PATH) OR (NOT GFLAGS_LIB))
+    message(FATAL_ERROR "Fail to find gflags")
+endif()
+
+include(FindOpenSSL)
+
 if((NOT BRPC_INCLUDE_PATH) OR (NOT BRPC_LIB))
     message(FATAL_ERROR "Fail to find brpc")
 endif()
@@ -109,26 +116,61 @@ include_directories(${LEVELDB_INCLUDE_PATH})
 add_executable(counter_client client.cpp ${PROTO_SRC} ${PROTO_HEADER})
 add_executable(counter_server server.cpp ${PROTO_SRC} ${PROTO_HEADER})
 
-set(DYNAMIC_LIB
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${GFLAGS_LIBRARY}
-    ${PROTOBUF_LIBRARY}
-    ${GPERFTOOLS_LIBRARIES}
-    ${LEVELDB_LIB}
-    ${BRAFT_LIB}
-    ${BRPC_LIB}
-    rt
-    ssl
-    crypto
-    dl
-    z
-    )
+if(BRPC_WITH_GLOG)
+    set(DYNAMIC_LIB
+        ${BRPC_LIB}
+        ${BRAFT_LIB}
+        ${GFLAGS_LIB}
+        ${GLOG_LIB}
+        ${PROTOBUF_LIBRARY}
+        ${LEVELDB_LIB}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${OPENSSL_SSL_LIBRARY}
+        ${OPENSSL_CRYPTO_LIBRARY}
+        ${GPERFTOOLS_LIBRARIES}
+        dl
+        z
+        )
+else()
+    set(DYNAMIC_LIB
+        ${BRPC_LIB}
+        ${BRAFT_LIB}
+        ${GFLAGS_LIB}
+        ${PROTOBUF_LIBRARY}
+        ${LEVELDB_LIB}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${OPENSSL_SSL_LIBRARY}
+        ${OPENSSL_CRYPTO_LIBRARY}
+        ${GPERFTOOLS_LIBRARIES}
+        dl
+        z
+        )
+endif()
 
-target_link_libraries(counter_client
-                      "-Xlinker \"-(\""
-                      ${DYNAMIC_LIB}
-                      "-Xlinker \"-)\"")
-target_link_libraries(counter_server
-                      "-Xlinker \"-(\""
-                      ${DYNAMIC_LIB}
-                      "-Xlinker \"-)\"")
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(DYNAMIC_LIB ${DYNAMIC_LIB}
+        pthread
+        "-framework CoreFoundation"
+        "-framework CoreGraphics"
+        "-framework CoreData"
+        "-framework CoreText"
+        "-framework Security"
+        "-framework Foundation"
+        "-Wl,-U,_MallocExtension_ReleaseFreeMemory"
+        "-Wl,-U,_ProfilerStart"
+        "-Wl,-U,_ProfilerStop"
+        "-Wl,-U,__Z13GetStackTracePPvii"
+        )
+else()
+    set(DYNAMIC_LIB ${DYNAMIC_LIB}
+        rt
+        )
+endif()
+
+
+include(CMakePrintHelpers)
+cmake_print_variables(OPENSSL_SSL_LIBRARY)
+
+target_link_libraries(counter_client ${DYNAMIC_LIB})
+target_link_libraries(counter_server ${DYNAMIC_LIB})

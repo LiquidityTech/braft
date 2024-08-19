@@ -37,7 +37,7 @@ eval set -- "${FLAGS_ARGV}"
 alias error=">&2 echo counter: "
 
 # hostname prefers ipv6
-IP=`hostname -i | awk '{print $NF}'`
+IP=`hostname -f | awk '{print $NF}'`
 
 if [ "$FLAGS_valgrind" == "true" ] && [ $(which valgrind) ] ; then
     VALGRIND="valgrind --tool=memcheck --leak-check=full"
@@ -45,8 +45,10 @@ fi
 
 raft_peers=""
 for ((i=0; i<$FLAGS_server_num; ++i)); do
-    raft_peers="${raft_peers}${IP}:$((${FLAGS_port}+i)):0,"
+    raft_peers="${raft_peers}${IP}:$((${FLAGS_port}+i)):$i,"
 done
+
+echo ${raft_peers}
 
 if [ "$FLAGS_clean" == "0" ]; then
     rm -rf runtime

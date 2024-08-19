@@ -3,6 +3,7 @@ project(braft C CXX)
 
 SET(CPACK_GENERATOR "DEB")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "braft authors") #required
+SET(CMAKE_MACOSX_RPATH OFF)
 
 INCLUDE(CPack)
 
@@ -79,7 +80,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(OPENSSL_ROOT_DIR
-        "/usr/local/opt/openssl"    # Homebrew installed OpenSSL
+        "/opt/homebrew/opt/openssl@3"    # Homebrew installed OpenSSL
         )
 endif()
 
@@ -138,6 +139,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         "-Wl,-U,_MallocExtension_ReleaseFreeMemory"
         "-Wl,-U,_ProfilerStart"
         "-Wl,-U,_ProfilerStop"
+        "-Wl,-U,__Z13GetStackTracePPvii"
         )
 else()
     set(DYNAMIC_LIB ${DYNAMIC_LIB}
