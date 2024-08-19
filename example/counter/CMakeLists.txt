@@ -32,11 +32,6 @@ else()
     find_library(BRAFT_LIB NAMES libbraft.a braft)
 endif()
 
-find_library(GFLAGS_LIB NAMES gflags)
-if ((NOT GFLAGS_INCLUDE_PATH) OR (NOT GFLAGS_LIB))
-    message(FATAL_ERROR "Fail to find gflags")
-endif()
-
 include(FindOpenSSL)
 
 if((NOT BRPC_INCLUDE_PATH) OR (NOT BRPC_LIB))
@@ -120,7 +115,7 @@ if(BRPC_WITH_GLOG)
     set(DYNAMIC_LIB
         ${BRPC_LIB}
         ${BRAFT_LIB}
-        ${GFLAGS_LIB}
+        ${GFLAGS_LIBRARY}
         ${GLOG_LIB}
         ${PROTOBUF_LIBRARY}
         ${LEVELDB_LIB}
@@ -135,7 +130,7 @@ else()
     set(DYNAMIC_LIB
         ${BRPC_LIB}
         ${BRAFT_LIB}
-        ${GFLAGS_LIB}
+        ${GFLAGS_LIBRARY}
         ${PROTOBUF_LIBRARY}
         ${LEVELDB_LIB}
         ${CMAKE_THREAD_LIBS_INIT}

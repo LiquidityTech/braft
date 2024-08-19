@@ -45,7 +45,7 @@ fi
 
 raft_peers=""
 for ((i=0; i<$FLAGS_server_num; ++i)); do
-    raft_peers="${raft_peers}${IP}:$((${FLAGS_port}+i)):$i,"
+    raft_peers="${raft_peers}${IP}:$((${FLAGS_port}+i)):0,"
 done
 
 echo ${raft_peers}
