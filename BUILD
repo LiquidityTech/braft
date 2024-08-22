@@ -35,7 +35,7 @@ LINKOPTS = [
     "-pthread",
     "-ldl",
 ] + select({
-    "@bazel_tools//tools/osx:darwin": [
+    "@bazel_tools//platforms:osx": [
         "-framework CoreFoundation",
         "-framework CoreGraphics",
         "-framework CoreData",
@@ -48,11 +48,8 @@ LINKOPTS = [
         "-Wl,-U,__Z13GetStackTracePPvii",
         "-Wl,-U,_RegisterThriftProtocol",
     ],
-    "@bazel_tools//platforms:linux": [
-        "-lrt",
-    ],
     "//conditions:default": [
-
+        "-lrt",
     ],
 }) + select({
     "//bazel/config:brpc_with_mesalink": [
