@@ -124,7 +124,7 @@ inline int random_timeout(int timeout_ms) {
 
 DEFINE_int32(raft_election_heartbeat_factor, 10, "raft election:heartbeat timeout factor");
 static inline int heartbeat_timeout(int election_timeout) {
-    return std::max(election_timeout / FLAGS_raft_election_heartbeat_factor, 10);
+    return std::max(election_timeout / FLAGS_raft_election_heartbeat_factor, 1);
 }
 
 NodeImpl::NodeImpl(const GroupId& group_id, const PeerId& peer_id)

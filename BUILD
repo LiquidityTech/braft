@@ -109,6 +109,28 @@ cc_binary(
             ":cc_example_counter_proto"],
 )
 
+cc_binary(
+    name = "queue_client",
+    srcs = [
+        "example/queue/queue_client.cpp",
+        ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [":braft",
+            ":cc_example_queue_proto"],
+)
+
+cc_binary(
+    name = "queue_server",
+    srcs = [
+        "example/queue/queue_server.cpp",
+        ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [":braft",
+            ":cc_example_queue_proto"],
+)
+
 braft_proto_library(
     name = "cc_braft_internal_proto",
     srcs = glob([
@@ -124,5 +146,14 @@ braft_proto_library(
         "example/counter/*.proto",
     ]),
     include = "example/counter",
+    visibility = ["//visibility:public"],
+)
+
+braft_proto_library(
+    name = "cc_example_queue_proto",
+    srcs = glob([
+        "example/queue/*.proto",
+    ]),
+    include = "example/queue",
     visibility = ["//visibility:public"],
 )
